@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "../styles/Login.module.scss";
 import Link from "next/link";
-
+import Router from "next/router";
 
 function Login(){
     const initialValues = {username: "", password: ""};
@@ -14,23 +14,38 @@ function Login(){
         const errors = validate(formValues);
         setFormErrors(errors);
         setisSubmit(true);
+        if (Object.keys(errors).length === 0){
+            if (authorize(formValues)){
+                Router.push("/admin");
+            }
+        }
     };
 
     const handleChange = (e) => {
-        console.log(e.target);
         const{ name, value } = e.target;
-        setFormValues({ ...formValues, [name]: value });
-        console.log(formValues);
+        const values = { ...formValues, [name]: value };
+        setFormValues(values);
         e.preventDefault();
-        //ログイン情報送信
-        //バリデーションチェック
+        setisSubmit(false);
+    };
+    
+    useEffect(() => {
         setFormErrors(validate(formValues));
-        setisSubmit(true);
+    }, [formValues]);
+
+    const authorize = (values) => {
+        if (values.username !== "user"){
+            return false;
+        }
+        if (values.password !== "password"){
+            return false;
+        }
+        return true;
     };
 
     const validate = (values) => {
         const errors = {};
-        if(!formValues.username){
+        if (!formValues.username){
             errors.username = "ユーザー名を入力してください";
         }
         if (!formValues.password){
@@ -44,46 +59,46 @@ function Login(){
     return(
         <div className= {styles.Login}>
             <form onSubmit={(e) => handleSubmit(e)}> 
-               <h1 className={styles.title}>ログインフォーム</h1>
-               <hr className={styles.hr}/>
-               <div className={styles.uiForm}>
-                   <div className={styles.formField}>
-                       <label>ユーザー名</label>
-                       <input type="text" 
-                       placeholder="ユーザー名" 
-                       name="username" 
-                       onChange={(e)=> handleChange(e)}
-                       className={styles.input}/>
-                   </div>
-               </div>
-               <p className={styles.errorsmessage}>
-                {formErrors.username}</p>
-               <div className={styles.lsuiForm}>
-                   <div className={styles.formField}>
-                       <label>パスワード</label>
-                       <input 
-                           type="password" 
-                           placeholder="パスワード" 
-                           name="password"
-                           onChange={(e)=> handleChange(e)}
-                       className={styles.input}/>
-                   </div>
-                   <div>
-                   <Link href="/admin">
+                <h1 className={styles.title}>ログインフォーム</h1>
+                <hr className={styles.hr}/>
+                <div className={styles.uiForm}>
+                    <div className={styles.formField}>
+                        <label>ユーザー名</label>
+                        <input 
+                            type="text" 
+                            placeholder="ユーザー名" 
+                            name="username" 
+                            onChange={(e)=> handleChange(e)}
+                            className={styles.input}
+                        />
+                    </div>
+                </div>
+                <p className={styles.errorsmessage}>{formErrors.username}</p>
+                <div className={styles.lsuiForm}>
+                    <div className={styles.formField}>
+                        <label>パスワード</label>
+                        <input 
+                            type="password" 
+                            placeholder="パスワード" 
+                            name="password"
+                            onChange={(e)=> handleChange(e)}
+                            className={styles.input}
+                        />
+                    </div>
+                </div>
+                <p className={styles.errorsmessage}>{formErrors.password}</p>
+                <div>
                     <button>ログイン</button>
-                   </Link>
-                   <p className={styles.errorsmessage}>{formErrors.username}</p>
-                   {Object.keys(formErrors).length === 0 && isSubmit &&(
-                       <div className={styles.ok}>ログインに成功しました</div>
-                   )}
-                   </div>
-                   <Link href="/">
-                   <button>戻る</button>
-                   </Link>
-               </div>
+                    {Object.keys(formErrors).length === 0 && isSubmit &&(
+                        <div className={styles.ok}>ログインに失敗しました</div>
+                    )}
+                </div>
+                <Link href="/">
+                <button>戻る</button>
+                </Link>
             </form>
-       </div>
-   );
+        </div>
+    );
 }
 
 
