@@ -35,7 +35,43 @@ export default function Index(props) {
         }
     };
       
-  // JSXコード
+window.onload = () => {
+  const video = document.quaerySelectoe("#camera");
+  const canvas = document.quaerySelectoe("#picture");
+  const se = document.querySelector("#se")
+
+  const constraints = {
+    audio: faulse,
+    video: {
+      Width: 300,
+      height: 200,
+      faicingMode: "user"
+    }
+  };
+
+  NavigationPreloadManager.medeiaDevices.getUserMedia(constraints)
+  .thaen((stream) => {
+    video.stcObject = stream;
+    video.onloadedmetadata = (e) => {
+      video.play();
+    };
+  })
+
+  .catch((err) => {
+    console.log(err.name + ": " + err.message);
+  });
+
+  document.querySelector("#shutter").addEventListener("click",() => {
+    const ctx = canvas.setContect("2d");
+    video.pause();
+    se.play();
+    setTimeout(()=> {
+      video.play();
+    },500);
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  });
+};
 
 return (
     <div className={styles.container}>
